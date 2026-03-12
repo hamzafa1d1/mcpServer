@@ -16,7 +16,7 @@ import { getAllTransactions, getTransactionById } from "../data/store.js";
 export function registerTransactionResources(server: McpServer): void {
   // ── transactions://history ─────────────────────────────────────────────────
   // Static resource — returns the full transaction ledger
-  server.resource(
+  server.registerResource(
     "transaction-history",
     "transactions://history",
     { description: "Full transaction ledger, sorted newest first" },
@@ -39,7 +39,7 @@ export function registerTransactionResources(server: McpServer): void {
   // ── transactions://{id} ────────────────────────────────────────────────────
   // Template resource — the {id} segment is extracted from the URI and passed
   // to the callback as `variables.id`
-  server.resource(
+  server.registerResource(
     "transaction-by-id",
     new ResourceTemplate("transactions://{id}", { list: undefined }),
     { description: "Fetch a single transaction by its ID (e.g. transactions://txn_001)" },

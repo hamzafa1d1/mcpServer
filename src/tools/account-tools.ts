@@ -5,10 +5,9 @@ import type { Account } from "../types.js";
 
 export function registerAccountTools(server: McpServer): void {
   // ── list_accounts ──────────────────────────────────────────────────────────
-  server.tool(
+  server.registerTool(
     "list_accounts",
-    "List all accounts in the system with their current balances.",
-    {},
+    { description: "List all accounts in the system with their current balances." },
     async () => {
       const accs = getAllAccounts();
       return {
@@ -20,11 +19,13 @@ export function registerAccountTools(server: McpServer): void {
   );
 
   // ── get_account ────────────────────────────────────────────────────────────
-  server.tool(
+  server.registerTool(
     "get_account",
-    "Get the full details of an account by its ID, including its current balance.",
     {
-      id: z.string().describe("Account ID, e.g. acc_001"),
+      description: "Get the full details of an account by its ID, including its current balance.",
+      inputSchema: {
+        id: z.string().describe("Account ID, e.g. acc_001"),
+      },
     },
     async ({ id }) => {
       const account = getAccountById(id);
@@ -39,11 +40,13 @@ export function registerAccountTools(server: McpServer): void {
   );
 
   // ── get_account_balance ────────────────────────────────────────────────────
-  server.tool(
+  server.registerTool(
     "get_account_balance",
-    "Get just the current balance of an account — a lightweight alternative to get_account.",
     {
-      id: z.string().describe("Account ID"),
+      description: "Get just the current balance of an account — a lightweight alternative to get_account.",
+      inputSchema: {
+        id: z.string().describe("Account ID"),
+      },
     },
     async ({ id }) => {
       const account = getAccountById(id);
@@ -65,24 +68,26 @@ export function registerAccountTools(server: McpServer): void {
   );
 
   // ── create_account ─────────────────────────────────────────────────────────
-  server.tool(
+  server.registerTool(
     "create_account",
-    "Create a new account with an optional initial balance.",
     {
-      name: z.string().min(1).max(100).describe("Full name or company name"),
-      email: z.string().email().describe("Contact email address"),
-      initialBalance: z
-        .number()
-        .min(0)
-        .optional()
-        .default(0)
-        .describe("Starting balance (defaults to 0)"),
-      currency: z
-        .string()
-        .length(3)
-        .optional()
-        .default("USD")
-        .describe("ISO 4217 currency code (defaults to USD)"),
+      description: "Create a new account with an optional initial balance.",
+      inputSchema: {
+        name: z.string().min(1).max(100).describe("Full name or company name"),
+        email: z.string().email().describe("Contact email address"),
+        initialBalance: z
+          .number()
+          .min(0)
+          .optional()
+          .default(0)
+          .describe("Starting balance (defaults to 0)"),
+        currency: z
+          .string()
+          .length(3)
+          .optional()
+          .default("USD")
+          .describe("ISO 4217 currency code (defaults to USD)"),
+      },
     },
     async ({ name, email, initialBalance, currency }) => {
       const account: Account = {
@@ -101,12 +106,14 @@ export function registerAccountTools(server: McpServer): void {
   );
 
   // ── deposit_funds ──────────────────────────────────────────────────────────
-  server.tool(
+  server.registerTool(
     "deposit_funds",
-    "Add funds to an account — simulates an external top-up or initial funding.",
     {
-      accountId: z.string().describe("Account ID to deposit into"),
-      amount: z.number().positive().describe("Amount to deposit"),
+      description: "Add funds to an account — simulates an external top-up or initial funding.",
+      inputSchema: {
+        accountId: z.string().describe("Account ID to deposit into"),
+        amount: z.number().positive().describe("Amount to deposit"),
+      },
     },
     async ({ accountId, amount }) => {
       const account = getAccountById(accountId);

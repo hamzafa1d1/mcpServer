@@ -22,15 +22,17 @@ import type { Transaction } from "../types.js";
  */
 export function registerTransactionTools(server: McpServer): void {
   // ── create_transaction ─────────────────────────────────────────────────────
-  server.tool(
+  server.registerTool(
     "create_transaction",
-    "Create a new payment or transfer between two accounts. Validates that the sender has enough balance and immediately processes the transaction.",
     {
-      fromAccountId: z.string().describe("ID of the account sending money (e.g. acc_001)"),
-      toAccountId: z.string().describe("ID of the account receiving money"),
-      amount: z.number().positive().describe("Amount to transfer in the sender's currency (e.g. 99.99)"),
-      type: z.enum(["payment", "transfer"]).describe("'payment' for goods/services, 'transfer' for moving funds"),
-      description: z.string().max(200).describe("Human-readable reason for the transaction"),
+      description: "Create a new payment or transfer between two accounts. Validates that the sender has enough balance and immediately processes the transaction.",
+      inputSchema: {
+        fromAccountId: z.string().describe("ID of the account sending money (e.g. acc_001)"),
+        toAccountId: z.string().describe("ID of the account receiving money"),
+        amount: z.number().positive().describe("Amount to transfer in the sender's currency (e.g. 99.99)"),
+        type: z.enum(["payment", "transfer"]).describe("'payment' for goods/services, 'transfer' for moving funds"),
+        description: z.string().max(200).describe("Human-readable reason for the transaction"),
+      },
     },
     async ({ fromAccountId, toAccountId, amount, type, description }) => {
       const sender = getAccountById(fromAccountId);
@@ -87,11 +89,13 @@ export function registerTransactionTools(server: McpServer): void {
   );
 
   // ── get_transaction ────────────────────────────────────────────────────────
-  server.tool(
+  server.registerTool(
     "get_transaction",
-    "Retrieve the full details of a specific transaction by its ID.",
     {
-      id: z.string().describe("Transaction ID, e.g. txn_001"),
+      description: "Retrieve the full details of a specific transaction by its ID.",
+      inputSchema: {
+        id: z.string().describe("Transaction ID, e.g. txn_001"),
+      },
     },
     async ({ id }) => {
       const txn = getTransactionById(id);
@@ -106,30 +110,32 @@ export function registerTransactionTools(server: McpServer): void {
   );
 
   // ── list_transactions ──────────────────────────────────────────────────────
-  server.tool(
+  server.registerTool(
     "list_transactions",
-    "List transactions with optional filters. All filters are combinable. Results are sorted newest first.",
     {
-      accountId: z
-        .string()
-        .optional()
-        .describe("Filter to transactions involving this account (as sender OR receiver)"),
-      status: z
-        .enum(["pending", "completed", "failed", "refunded"])
-        .optional()
-        .describe("Filter by transaction status"),
-      type: z
-        .enum(["payment", "transfer", "refund"])
-        .optional()
-        .describe("Filter by transaction type"),
-      limit: z
-        .number()
-        .int()
-        .positive()
-        .max(100)
-        .optional()
-        .default(20)
-        .describe("Maximum number of results to return (default 20, max 100)"),
+      description: "List transactions with optional filters. All filters are combinable. Results are sorted newest first.",
+      inputSchema: {
+        accountId: z
+          .string()
+          .optional()
+          .describe("Filter to transactions involving this account (as sender OR receiver)"),
+        status: z
+          .enum(["pending", "completed", "failed", "refunded"])
+          .optional()
+          .describe("Filter by transaction status"),
+        type: z
+          .enum(["payment", "transfer", "refund"])
+          .optional()
+          .describe("Filter by transaction type"),
+        limit: z
+          .number()
+          .int()
+          .positive()
+          .max(100)
+          .optional()
+          .default(20)
+          .describe("Maximum number of results to return (default 20, max 100)"),
+      },
     },
     async ({ accountId, status, type, limit }) => {
       let results = accountId ? getTransactionsByAccount(accountId) : getAllTransactions();
@@ -152,12 +158,14 @@ export function registerTransactionTools(server: McpServer): void {
   );
 
   // ── refund_transaction ─────────────────────────────────────────────────────
-  server.tool(
+  server.registerTool(
     "refund_transaction",
-    "Refund a completed transaction. Reverses the balance transfer and creates a refund record.",
     {
-      id: z.string().describe("ID of the completed transaction to refund"),
-      reason: z.string().max(200).optional().describe("Reason for the refund"),
+      description: "Refund a completed transaction. Reverses the balance transfer and creates a refund record.",
+      inputSchema: {
+        id: z.string().describe("ID of the completed transaction to refund"),
+        reason: z.string().max(200).optional().describe("Reason for the refund"),
+      },
     },
     async ({ id, reason }) => {
       const original = getTransactionById(id);

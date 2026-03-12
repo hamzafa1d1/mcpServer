@@ -3,7 +3,7 @@ import { getAllAccounts, getAccountById } from "../data/store.js";
 
 export function registerAccountResources(server: McpServer): void {
   // ── accounts://list ────────────────────────────────────────────────────────
-  server.resource(
+  server.registerResource(
     "accounts-list",
     "accounts://list",
     { description: "All accounts with their current balances" },
@@ -22,7 +22,7 @@ export function registerAccountResources(server: McpServer): void {
   );
 
   // ── accounts://{id} ────────────────────────────────────────────────────────
-  server.resource(
+  server.registerResource(
     "account-by-id",
     new ResourceTemplate("accounts://{id}", { list: undefined }),
     { description: "Fetch a single account by its ID (e.g. accounts://acc_001)" },

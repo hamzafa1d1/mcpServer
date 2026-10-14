@@ -1,6 +1,24 @@
-# Payment MCP Server
+# Payment MCP Lab
 
 A payments & transactions MCP server built in TypeScript — designed as a **deep-dive learning project** into MCP server architecture.
+
+
+## Verification
+
+```sh
+npm ci
+npm run build
+node scripts/smoke-test.mjs
+```
+
+The smoke check opens an MCP stdio client connection, discovers tools and retrieves the synthetic seed accounts. It checks protocol integration, not production payment correctness. The same build and smoke check run in GitHub Actions.
+
+## Scope and limitations
+
+This is an independent learning project, not a payment processor. It uses synthetic seed data and an in-memory store that resets when the process restarts. It does not connect to a bank or move real money. The examples demonstrate MCP integration; they do not establish production-grade authentication, persistence, monetary precision or reliability.
+
+**Stack:** TypeScript, MCP SDK, Zod and a local stdio transport.
+
 
 ---
 
